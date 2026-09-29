@@ -11,6 +11,7 @@ var string keyForward;
 var string keyBackward;
 var string keyLeft;
 var string keyRight;
+var string keySingleTapDodge;
 
 var array<Actor.EDoubleClickDir> activeDir;
 var ShiftDodgeReplicator Replicator;
@@ -21,6 +22,9 @@ event Initialized()
 	keyBackward = Class'GameInfo'.static.GetKeyBindName("movebackward", ViewportOwner.Actor);
 	keyLeft = Class'GameInfo'.static.GetKeyBindName("strafeleft", ViewportOwner.Actor);
 	keyRight = Class'GameInfo'.static.GetKeyBindName("straferight", ViewportOwner.Actor);
+	keySingleTapDodge = Class'GameInfo'.static.GetKeyBindName("SingleTapDodge", ViewportOwner.Actor);
+	if ( keySingleTapDodge ~= "SingleTapDodge" )
+		keySingleTapDodge = "Shift";
 }
 /*close*/
 
@@ -43,7 +47,7 @@ function bool KeyEvent(out EInputKey Key, out EInputAction Action, float Delta)
 		updateDir(DCLICK_Left, (Action == IST_Press));
 	else if ( keyName ~= keyRight )
 		updateDir(DCLICK_Right, (Action == IST_Press));
-	else if ( keyName ~= "Shift" && Action == IST_Press && PC.Pawn != None )
+	else if ( keyName ~= keySingleTapDodge && Action == IST_Press && PC.Pawn != None )
 	    {
 		if ( activeDir.length > 0 && PC.DoubleClickDir < DCLICK_Active )
 		{

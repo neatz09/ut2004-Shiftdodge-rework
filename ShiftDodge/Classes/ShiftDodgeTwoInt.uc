@@ -11,6 +11,7 @@ var string keyForward;
 var string keyBackward;
 var string keyLeft;
 var string keyRight;
+var string keySingleTapDodge;
 var ShiftDodgeReplicator Replicator;
 
 event Initialized()
@@ -19,6 +20,9 @@ event Initialized()
 	keyBackward = Class'GameInfo'.static.GetKeyBindName("movebackward", ViewportOwner.Actor);
 	keyLeft = Class'GameInfo'.static.GetKeyBindName("strafeleft", ViewportOwner.Actor);
 	keyRight = Class'GameInfo'.static.GetKeyBindName("straferight", ViewportOwner.Actor);
+	keySingleTapDodge = Class'GameInfo'.static.GetKeyBindName("SingleTapDodge", ViewportOwner.Actor);
+	if ( keySingleTapDodge ~= "SingleTapDodge" )
+		keySingleTapDodge = "Shift";
 }
 /*close*/
 
@@ -34,7 +38,7 @@ function bool KeyEvent(out EInputKey Key, out EInputAction Action, float Delta)
 	PC = ViewportOwner.Actor;
 	keyName = GetFriendlyName(Key);
 
-	if ( keyName ~= "Shift" )
+	if ( keyName ~= keySingleTapDodge )
 	{
 		bHoldingShift = (Action == IST_Press);
 		lastDClick = PC.DoubleClickDir;
