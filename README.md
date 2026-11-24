@@ -25,6 +25,3 @@ Run **one** of `ShiftDodge.MutShiftDodge` or `ShiftDodge.MutShiftDodgeTwo`. Both
 automatically add the package to the server package map. Update a redirect copy if
 your server uses one. Rebuilding an existing package changes its GUID; clients with
 an older manually installed `System/ShiftDodge.u` must remove or update that copy.
-
-See [client-controls-validation.md](docs/client-controls-validation.md) for the
-verification results and the remaining dedicated-server/client acceptance checks.
