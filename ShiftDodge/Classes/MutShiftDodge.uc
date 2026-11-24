@@ -79,9 +79,8 @@ simulated function Tick(float DeltaTime)
 		return;
 
 	PC = Level.GetLocalPlayerController();
-	if ( PC != None && PC.Player != None && PC.Player.InteractionMaster != None )
+	if ( class'ShiftDodgeReplicator'.static.EnsureInteraction(PC, string(class'ShiftDodgeInt')) != None )
 	{
-		PC.Player.InteractionMaster.AddInteraction(string(class'ShiftDodgeInt'), PC.Player);
 		bHasInteraction = true;
 		Disable('Tick');
 	}
@@ -106,4 +105,5 @@ defaultproperties
 	Description="Shift Dodge 1 - press shift while holding movement key to dodge"
 	bAlwaysRelevant=true
 	RemoteRole=ROLE_SimulatedProxy
+	bAddToServerPackages=true
 }

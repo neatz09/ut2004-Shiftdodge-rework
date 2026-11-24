@@ -4,27 +4,12 @@
 //====================================================================================
 class ShiftDodgeInt extends Interaction;
 
-var bool bHoldingShift;
-var Actor.EDoubleClickDir lastDClick;
-
-var string keyForward;
-var string keyBackward;
-var string keyLeft;
-var string keyRight;
-var string keyHoldingShift;
-
 var array<Actor.EDoubleClickDir> activeDir;
 var ShiftDodgeReplicator Replicator;
 
 event Initialized()
 {
-	keyForward = Class'GameInfo'.static.GetKeyBindName("moveforward", ViewportOwner.Actor);
-	keyBackward = Class'GameInfo'.static.GetKeyBindName("movebackward", ViewportOwner.Actor);
-	keyLeft = Class'GameInfo'.static.GetKeyBindName("strafeleft", ViewportOwner.Actor);
-	keyRight = Class'GameInfo'.static.GetKeyBindName("straferight", ViewportOwner.Actor);
-	keyHoldingShift = Class'GameInfo'.static.GetKeyBindName("holdingshift", ViewportOwner.Actor);
-	if ( keyHoldingShift ~= "holdingshift" )
-		keyHoldingShift = "Shift";
+	class'SingleTapDodgeKeyBinding'.static.EnsureControls(ViewportOwner.Actor);
 }
 /*close*/
 
@@ -32,22 +17,26 @@ function bool KeyEvent(out EInputKey Key, out EInputAction Action, float Delta)
 {
 	local PlayerController PC;
 	local string keyName;
+	local string Binding;
 
 	if ( ViewportOwner == None || ViewportOwner.Actor == None )
 		return Super.KeyEvent(Key, Action, Delta);
 
 	PC = ViewportOwner.Actor;
 	keyName = GetFriendlyName(Key);
+	if (Action != IST_Press && Action != IST_Release)
+		return Super.KeyEvent(Key, Action, Delta);
+	Binding = PC.ConsoleCommand("KEYBINDING" @ keyName);
 
-	if ( keyName ~= keyForward )
+	if ( Binding ~= "moveforward" )
 		updateDir(DCLICK_Forward, (Action == IST_Press));
-	else if ( keyName ~= keyBackward )
+	else if ( Binding ~= "movebackward" )
 		updateDir(DCLICK_Back, (Action == IST_Press));
-	else if ( keyName ~= keyLeft )
+	else if ( Binding ~= "strafeleft" )
 		updateDir(DCLICK_Left, (Action == IST_Press));
-	else if ( keyName ~= keyRight )
+	else if ( Binding ~= "straferight" )
 		updateDir(DCLICK_Right, (Action == IST_Press));
-	else if ( keyName ~= keyHoldingShift && Action == IST_Press && PC.Pawn != None )
+	else if ( Binding ~= "holdingshift" && Action == IST_Press && PC.Pawn != None )
 	    {
 		if ( activeDir.length > 0 && PC.DoubleClickDir < DCLICK_Active )
 		{

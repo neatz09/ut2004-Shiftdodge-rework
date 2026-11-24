@@ -7,22 +7,12 @@ class ShiftDodgeTwoInt extends Interaction;
 var bool bHoldingShift;
 var Actor.EDoubleClickDir lastDClick;
 
-var string keyForward;
-var string keyBackward;
-var string keyLeft;
-var string keyRight;
-var string keyHoldingShift;
+var string HeldDodgeKey;
 var ShiftDodgeReplicator Replicator;
 
 event Initialized()
 {
-	keyForward = Class'GameInfo'.static.GetKeyBindName("moveforward", ViewportOwner.Actor);
-	keyBackward = Class'GameInfo'.static.GetKeyBindName("movebackward", ViewportOwner.Actor);
-	keyLeft = Class'GameInfo'.static.GetKeyBindName("strafeleft", ViewportOwner.Actor);
-	keyRight = Class'GameInfo'.static.GetKeyBindName("straferight", ViewportOwner.Actor);
-	keyHoldingShift = Class'GameInfo'.static.GetKeyBindName("holdingshift", ViewportOwner.Actor);
-	if ( keyHoldingShift ~= "holdingshift" )
-		keyHoldingShift = "Shift";
+	class'SingleTapDodgeKeyBinding'.static.EnsureControls(ViewportOwner.Actor);
 }
 /*close*/
 
@@ -30,6 +20,7 @@ function bool KeyEvent(out EInputKey Key, out EInputAction Action, float Delta)
 {
 	local PlayerController PC;
 	local string keyName;
+	local string Binding;
 	local Actor.EDoubleClickDir Dir;
 
 	if ( ViewportOwner == None || ViewportOwner.Actor == None )
@@ -37,10 +28,16 @@ function bool KeyEvent(out EInputKey Key, out EInputAction Action, float Delta)
 
 	PC = ViewportOwner.Actor;
 	keyName = GetFriendlyName(Key);
+	if (Action != IST_Press && Action != IST_Release)
+		return Super.KeyEvent(Key, Action, Delta);
+	Binding = PC.ConsoleCommand("KEYBINDING" @ keyName);
+	if (bHoldingShift && !(PC.ConsoleCommand("KEYBINDING" @ HeldDodgeKey) ~= "holdingshift"))
+		bHoldingShift = false;
 
-	if ( keyName ~= keyHoldingShift )
+	if ( Binding ~= "holdingshift" )
 	{
 		bHoldingShift = (Action == IST_Press);
+		HeldDodgeKey = keyName;
 		lastDClick = PC.DoubleClickDir;
 		return true;
 	}
@@ -48,13 +45,13 @@ function bool KeyEvent(out EInputKey Key, out EInputAction Action, float Delta)
 	{
 		if ( Replicator == None )
 			Replicator = FindReplicator(PC);
-		if ( keyName ~= keyForward )
+		if ( Binding ~= "moveforward" )
 			Dir = DCLICK_Forward;
-		else if ( keyName ~= keyBackward )
+		else if ( Binding ~= "movebackward" )
 			Dir = DCLICK_Back;
-		else if ( keyName ~= keyLeft )
+		else if ( Binding ~= "strafeleft" )
 			Dir = DCLICK_Left;
-		else if ( keyName ~= keyRight )
+		else if ( Binding ~= "straferight" )
 			Dir = DCLICK_Right;
 		else
 			return Super.KeyEvent(Key, Action, Delta);

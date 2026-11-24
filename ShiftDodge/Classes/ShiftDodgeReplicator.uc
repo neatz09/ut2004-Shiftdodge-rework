@@ -25,12 +25,26 @@ simulated function Timer()
                 return;
 
         PC = PlayerController(Owner);
-        if ( PC != None && PC.Player != None && PC.Player.InteractionMaster != None )
+        if ( EnsureInteraction(PC, InteractionClassName) != None )
         {
-                PC.Player.InteractionMaster.AddInteraction(InteractionClassName, PC.Player);
                 bInteractionAdded = true;
                 SetTimer(0.0, false);
         }
+}
+
+// Both the local mutator and the owner-only replicator can become ready first.
+static function Interaction EnsureInteraction(PlayerController PC, string ClassName)
+{
+        local int I;
+
+        if ( PC == None || Viewport(PC.Player) == None || PC.Player.InteractionMaster == None )
+                return None;
+
+        for ( I = 0; I < PC.Player.LocalInteractions.Length; I++ )
+                if ( string(PC.Player.LocalInteractions[I].Class) ~= ClassName )
+                        return PC.Player.LocalInteractions[I];
+
+        return PC.Player.InteractionMaster.AddInteraction(ClassName, PC.Player);
 }
 
 function ServerDodge(Actor.EDoubleClickDir Dir)
